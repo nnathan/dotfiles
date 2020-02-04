@@ -1,0 +1,142 @@
+# imap
+## .muttrc_auth should contain the following
+## set folder = "imaps://mail.messagingengine.com/"
+## set imap_user = "billg@microsoft.com"
+## set imap_pass = "hunter2"
+source ~/.muttrc_auth
+
+set imap_idle = yes
+set spoolfile = "+INBOX" # specifies default mailbox
+set postponed = "+INBOX/Drafts" # stores a copy of message until its sent (draft)
+set record = "+INBOX/Sent Items"
+set imap_keepalive = 120
+
+## header cache (make sure $HOME/.mutt_hcache is a directory or there
+## will be only one header cache file)
+set header_cache = $HOME/.local/tmp/.mutt_hcache
+
+## sets mailboxes to all imap subscribed mailboxes
+set imap_check_subscribed
+
+# smtp
+## .muttrc_auth should contain the following
+## set smtp_url = "smtps://billg@microsoft.com:hunter2@mail.messagingengine.com:465"
+source ~/.muttrc_auth
+
+# nntp
+set news_server="news://news.gmane.org/"
+set news_cache_dir="$HOME/.local/tmp"
+set nntp_context=10000
+
+set sort = reverse-date
+
+# mailing hooks
+folder-hook . unmy_hdr Bcc:
+folder-hook . 'set from = "Bill Gates <billg@microsoft.com>"'
+folder-hook . 'macro index G ":exec imap-fetch-mail\n"   "Fetch IMAP Mail"'
+folder-hook . 'macro index,pager d "s=INBOX/Trash\n" "Save message to the Deleted Box"'
+folder-hook . 'set record = "+INBOX/Sent Items"
+
+folder-hook INBOX.kb unmy_hdr Bcc:
+folder-hook INBOX.kb 'set from = "William Gates <billg@kb.microsoft.com>"'
+folder-hook INBOX.kb 'set record = "+INBOX.kb.sent"'
+
+
+# keybindings
+
+macro index,pager u "<pipe-message> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+macro index ,c "<enter-command>exec tag-prefix "   "Fetch IMAP Mail"
+
+bind index,pager G imap-fetch-mail
+
+## sidebar
+
+bind index,pager \Cp sidebar-prev
+bind index,pager \Cn sidebar-next
+bind index,pager \Co sidebar-open
+bind index,pager \C<enter> sidebar-open
+bind index,pager B sidebar-toggle-visible
+
+## full/half page up/down
+
+bind index \Cf next-page
+bind index \Cb previous-page
+bind pager \Cf next-page
+bind pager \Cb previous-page
+
+bind index \Cu half-up
+bind index \Cd half-down
+bind pager \Cu half-up
+bind pager \Cd half-down
+
+# colours
+color normal   white black
+color attachment brightyellow black
+color hdrdefault red white
+color indicator yellow red
+color markers   brightred black
+color quoted   green black
+color signature cyan black
+color status   white blue # Menu Bars
+color tilde   blue black
+color tree   green black
+
+color header white red ^.*$
+color header brightyellow red ^(To|From|Subject|Date).*$
+
+color body cyan  black [\-\.+_a-zA-Z0-9]+@[\-\.a-zA-Z0-9]+
+color body cyan  black (https?|ftp)://[\-\.,/%~_:?&=\#a-zA-Z0-9]+
+
+color index yellow default "~N !~T !~F"
+color index brightmagenta default "~s '^\\[SPAM\\]'"
+color search brightyellow red
+color index brightgreen default "~T"
+
+color sidebar_highlight white blue
+color sidebar_divider color8 black
+color sidebar_flagged red black
+color sidebar_new green black
+
+## behaviour
+
+alternative_order text/enriched text/plain text application/postscript image/*
+
+set quit=yes
+auto_view text/html
+auto_view image/*
+## set vim to use linewrap length of 72 columns
+set editor="nvim -c \":set encoding=utf-8 titlestring=MUTT\\ VIM tw=72 wm=72\""
+
+## set mutt to forward messages as mime attachments
+set mime_forward=yes
+set ascii_chars=yes
+set charset=utf-8
+set use_envelope_from
+mime_lookup application/octet-stream
+
+set index_format="%4C %2N %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s"
+
+## header order
+hdr_order From: To: Subject: Date: Reply-To: Cc: Resent-From: X-Mailer: User-Agent: X-Operating-System:
+set duplicate_threads=yes
+
+## pager settings
+set pager_stop=yes
+set markers=no
+
+set pager_format="-%Z- %C/%m: %[%a, %d %b %Y %T %z] %*  -- (%P)"
+
+## contacts
+
+set query_command= "khard email --parsable %s"
+bind editor <Tab> complete-query
+bind editor ^T    complete
+
+# sidebar
+
+set sidebar_visible = no
+set sidebar_format = "%B%?F? [%F]?%* %?N?%N/?%S"
+set mail_check_stats
+set sidebar_sort_method = 'new'
+set sidebar_new_mail_only = yes
+set sidebar_next_new_wrap = yes

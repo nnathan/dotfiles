@@ -1,0 +1,38 @@
+# this config is to facilitate one-way backups from fastmail to local maildir,
+# it is specifically set to "Sync Pull" on the IMAP account to ensure
+# read-only access.
+#
+# to run:
+#
+#   brew install isync
+#   mbsync -a
+
+BufferLimit 1024m
+
+IMAPAccount fastmail
+Host mail.messagingengine.com
+User billg@microsoft.com
+Pass hunter2
+SSLType IMAPS
+CertificateFile /usr/local/etc/openssl/cert.pem
+
+IMAPStore fastmail-remote
+Account fastmail
+
+MaildirStore fastmail-local
+Subfolders Verbatim
+# The trailing "/" is important
+Path ~/fm/
+Inbox ~/fm/INBOX
+Flatten .
+
+
+Channel fastmail
+Master :fastmail-remote:
+Slave :fastmail-local:
+Patterns *
+Create Both
+SyncState *
+Sync pull
+Expunge none
+CopyArrivalDate yes

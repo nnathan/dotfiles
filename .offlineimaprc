@@ -1,0 +1,23 @@
+# to do a one-shot backup:
+#
+# $ offlineimap -a fastmail
+
+[general]
+accounts = fastmail
+ui = blinkenlights
+
+[Account fastmail]
+localrepository = Local
+remoterepository = Remote
+
+[Repository Local]
+type = Maildir
+localfolders = ~/fastmail
+
+[Repository Remote]
+type = IMAP
+remotehost = mail.messagingengine.com
+remoteuser = billg@microsoft.com
+remotepass = hunter2
+ssl=true
+sslcacertfile = /usr/local/etc/openssl/cert.pem
