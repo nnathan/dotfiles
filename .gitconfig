@@ -1,0 +1,51 @@
+[branch]
+  autosetupmerge = true
+[alias]
+  co = checkout
+  ci = commit
+  st = status
+  br = branch -a -vvv
+  brs = branch -a -vvv --sort committerdate
+  co = checkout
+  df = diff
+  ds = diff --staged
+  lg = log -p
+  ll = log --graph --pretty=format:'%C(yellow)%h%C(cyan)%d%Creset %s %C(white)- %an, %ar%Creset'
+  wt = worktree
+  hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+  type = cat-file -t
+  dump = cat-file -p
+  plog = log --color  --pretty=format:\"%C(red)%h %C(yellow)%ad %C(green)%an%C(reset): %s\" --date=short
+  unstage = reset HEAD --
+  uncommit = reset --soft HEAD^
+  cdiff = diff --cached
+  branches = branch -a
+  rl = reflog --pretty=reflog
+[pretty]
+  reflog = %C(auto)%h %<|(20)%gd %C(blue)%cr%C(reset) %gs (%s)
+[color]
+  ui = auto
+[color "branch"]
+  current = cyan
+  local = yellow
+  remote = green
+[color "diff"]
+  meta = white bold
+  frag = cyan bold
+  old = red bold
+  new = green bold
+[color "status"]
+  added = cyan
+  changed = green
+  untracked = yellow
+[push]
+  default = simple
+[diff]
+  tool = vimdiff
+[core]
+  editor = vim
+[user]
+  name = Naveen Nathan
+  email = naveen@lastninja.net
+[rerere]
+  enabled = true
