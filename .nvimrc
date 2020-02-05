@@ -5,6 +5,7 @@
 " Then call :PlugInstall
 
 call plug#begin()
+Plug 'davidhalter/jedi-vim'
 Plug 'nnathan/desertrocks'
 Plug 'fatih/vim-go', { 'tag': '*' }
 " we really need to get rid of this - github.com/nnathan/desertrocks
@@ -16,6 +17,7 @@ Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-fugitive'     
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-sensible'
+Plug 'udalov/kotlin-vim'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'w0rp/ale'
 Plug 'simnalamburt/vim-mundo'
