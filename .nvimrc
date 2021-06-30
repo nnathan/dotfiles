@@ -140,9 +140,16 @@ nnoremap <esc> :noh<return><esc>
 let g:ale_sign_error = '🐒'
 let g:ale_sign_warning = '🥔'
 
-let g:ale_linters = {'go': ['golangci-lint'], 'c': ['gcc', 'clang']}
+" remember to run:
+" go install honnef.co/go/tools/cmd/staticcheck
+" go install github.com/mgechev/revive
+let g:ale_linters = {
+\   'go': ['revive', 'staticcheck'],
+\   'c': ['gcc', 'clang']
+\}
 let g:ale_go_golangci_lint_options = '--enable gofmt'
 let g:ale_go_golangci_lint_package = 1
+let g:ale_go_staticcheck_lint_package = 1
 
 let g:ale_fixers = {
 \   'sh': ['shfmt'],
