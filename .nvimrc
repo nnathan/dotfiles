@@ -190,6 +190,9 @@ let g:gutentags_cache_dir = expand('~/.cache/tags')
 
 " change focus to quickfix window after search (optional).
 let g:gutentags_plus_switch = 1
+
+" exclude annoying directories/files
+let g:gutentags_ctags_exclude = ['node_modules', 'public', 'bin', 'build', 'CMakeFiles', 'cpplint.py']
 " }}}
 
 " {{{ vim-go settings
