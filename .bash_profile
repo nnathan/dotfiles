@@ -123,6 +123,8 @@ fi
 if [ -f ~/.fzf.bash ]; then
   # shellcheck source=/dev/null # this is a linter directive
   source ~/.fzf.bash
+  # remove keybinding seems necessary otherwise bash seems to cry
+  bind -r "\C-t"
   bind '"\C-t": transpose-chars'
   export FZF_DEFAULT_OPTS='--height=60% --border --inline-info --prompt="🥑 "'
 fi
