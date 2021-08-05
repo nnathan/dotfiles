@@ -93,8 +93,19 @@ export GREP_COLOR='00;38;5;157'
 export EDITOR=vim
 export GOPATH=$HOME/go
 export PATH=$PATH:/usr/local/sbin:$HOME/.local/bin:$HOME/.local/sbin:${GOPATH//://bin:}/bin
-if [ x"$(uname -s)" = xDarwin ]; then
-  export PATH=$PATH:$HOME/Library/Android/sdk/platform-tools/:$HOME/Library/Python/3.7/bin:$HOME/Library/Python/2.7/bin
+if [ "$(uname -s)" = Darwin ]; then
+  if [ -d "$HOME/Library/Android/sdk/platform-tools" ]
+  then
+    PATH=$PATH:$HOME/Library/Android/sdk/platform-tools
+  fi
+
+  if [ -d "$HOME/Library/Python" ]
+  then
+    while read -r d
+    do
+      PATH=$PATH:$HOME/Library/Python/$d/bin
+    done < <( cd "$HOME/Library/Python" || exit; printf -- "%s\n" * | sort -t "." -k1,1nr -k2,2nr )
+  fi
 fi
 alias phgrep='cat ~/.persistent_history|grep --color'
 
