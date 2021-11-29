@@ -64,24 +64,6 @@ else
 fi
 # end permanent history
 
-if [ -f ~/.local/bin/z.lua ]; then
-  export _ZL_ECHO=1
-  export _ZL_HYPHEN=1
-  eval "$(lua ~/.local/bin/z.lua --init bash enhanced once fzf)"
-
-  alias j=z
-  alias jz='z -c' # restrict matches to subdirs of $PWD
-  alias ji='z -i' # cd with interactive selection
-  alias jf='z -I' # use fzf to select in multiple matches
-  alias jb='z -b' # quickly cd to the parent directory
-
-  alias zz='z -c' # restrict matches to subdirs of $PWD
-  alias zi='z -i' # cd with interactive selection
-  alias zf='z -I' # use fzf to select in multiple matches
-  alias zb='z -b' # quickly cd to the parent directory
-  alias zt='z -t' # output most recent match
-fi
-
 alias lg='cd $(git rev-parse --show-toplevel)'
 alias lge='git rev-parse --show-toplevel'
 
@@ -106,6 +88,10 @@ if [ "$(uname -s)" = Darwin ]; then
       PATH=$PATH:$HOME/Library/Python/$d/bin
     done < <( cd "$HOME/Library/Python" || exit; printf -- "%s\n" * | sort -t "." -k1,1nr -k2,2nr )
   fi
+
+  if [ "$(uname -p)" = arm -a -d /opt/homebrew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
 fi
 alias phgrep='cat ~/.persistent_history|grep --color'
 
@@ -125,6 +111,24 @@ if type keychain >/dev/null 2>&1; then
   keychain ~/.ssh/id*[!.][!p][!u][!b]
   # shellcheck source=/dev/null # this is a linter directive
   . ~/.keychain/"${HOSTNAME}"-sh
+fi
+
+if [ -f ~/.local/bin/z.lua ]; then
+  export _ZL_ECHO=1
+  export _ZL_HYPHEN=1
+  eval "$(lua ~/.local/bin/z.lua --init bash enhanced once fzf)"
+
+  alias j=z
+  alias jz='z -c' # restrict matches to subdirs of $PWD
+  alias ji='z -i' # cd with interactive selection
+  alias jf='z -I' # use fzf to select in multiple matches
+  alias jb='z -b' # quickly cd to the parent directory
+
+  alias zz='z -c' # restrict matches to subdirs of $PWD
+  alias zi='z -i' # cd with interactive selection
+  alias zf='z -I' # use fzf to select in multiple matches
+  alias zb='z -b' # quickly cd to the parent directory
+  alias zt='z -t' # output most recent match
 fi
 
 [[ -r /usr/local/etc/profile.d/bash_completion.sh ]] && . /usr/local/etc/profile.d/bash_completion.sh
