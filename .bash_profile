@@ -131,7 +131,20 @@ if [ -f ~/.local/bin/z.lua ]; then
   alias zt='z -t' # output most recent match
 fi
 
-[[ -r /usr/local/etc/profile.d/bash_completion.sh ]] && . /usr/local/etc/profile.d/bash_completion.sh
+if [[ -r "/etc/profile.d/bash_completion.sh" ]]
+then
+  # shellcheck disable=SC1091
+  . "/etc/profile.d/bash_completion.sh"
+elif [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]]
+then
+  # shellcheck disable=SC1091
+  . "/usr/local/etc/profile.d/bash_completion.sh"
+elif [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]]
+then
+  # shellcheck disable=SC1091
+  . "/opt/homebrew/etc/profile.d/bash_completion.sh"
+fi
+
 # bash completion 2 only - for some reason completion breaks when using 2.
 #export BASH_COMPLETION_COMPAT_DIR="/usr/local/etc/bash_completion.d"
 
