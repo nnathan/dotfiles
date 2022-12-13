@@ -113,22 +113,9 @@ if type keychain >/dev/null 2>&1; then
   . ~/.keychain/"${HOSTNAME}"-sh
 fi
 
-if [ -f ~/.local/bin/z.lua ]; then
-  export _ZL_ECHO=1
-  export _ZL_HYPHEN=1
-  eval "$(lua ~/.local/bin/z.lua --init bash enhanced once fzf)"
-
-  alias j=z
-  alias jz='z -c' # restrict matches to subdirs of $PWD
-  alias ji='z -i' # cd with interactive selection
-  alias jf='z -I' # use fzf to select in multiple matches
-  alias jb='z -b' # quickly cd to the parent directory
-
-  alias zz='z -c' # restrict matches to subdirs of $PWD
-  alias zi='z -i' # cd with interactive selection
-  alias zf='z -I' # use fzf to select in multiple matches
-  alias zb='z -b' # quickly cd to the parent directory
-  alias zt='z -t' # output most recent match
+if type zoxide >/dev/null 2>&1
+then
+  eval "$(zoxide init bash --cmd j)"
 fi
 
 if [[ -r "/etc/profile.d/bash_completion.sh" ]]
