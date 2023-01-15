@@ -132,8 +132,19 @@ vim.api.nvim_create_autocmd('ColorScheme', {
   pattern = '*',
   command = 'highlight Search ctermbg=24 ctermfg=49 guibg=DeepSkyBlue4 guifg=MediumSpringGreen'
 })
+
 vim.g.desertrocks_show_whitespace = 1
 vim.cmd [[colorscheme desertrocks]]
+if vim.g.desertrocks_show_whitespace then
+  local ag = vim.api.nvim_create_augroup('desertrocks_show_whitespace', { clear = true })
+  vim.api.nvim_create_autocmd('VimEnter', { -- using VimEnter instead of Syntax because nvim sets syntax on and the event never triggers/it deletes the existing autocommands
+    pattern = '*',
+    command = [[syntax match Tab /\v\t/ containedin=ALL | syntax match TrailingWS /\v\s\ze\s*$/ containedin=ALL]],
+    group = ag,
+  })
+  vim.cmd [[highlight Tab ctermbg=240 guibg=Grey50]]
+  vim.cmd [[highlight TrailingWS ctermbg=203 guibg=IndianRed1]]
+end
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
