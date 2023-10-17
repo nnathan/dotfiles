@@ -120,6 +120,8 @@ vim.wo.signcolumn = 'auto'
 -- Set colorscheme
 vim.o.termguicolors = true
 
+-- pmenu colours
+
 vim.api.nvim_create_autocmd('ColorScheme', {
   pattern = '*',
   command = 'highlight Pmenu ctermbg=60 ctermfg=81 guibg=MediumPurple4 guifg=SteelBlue1'
@@ -131,6 +133,23 @@ vim.api.nvim_create_autocmd('ColorScheme', {
 vim.api.nvim_create_autocmd('ColorScheme', {
   pattern = '*',
   command = 'highlight Search ctermbg=24 ctermfg=49 guibg=DeepSkyBlue4 guifg=MediumSpringGreen'
+})
+
+-- tabmenu colours
+
+vim.api.nvim_create_autocmd('ColorScheme', {
+  pattern = '*',
+  command = 'highlight TabLineFill ctermbg=DarkGreen ctermfg=LightGreen guibg=SeaGreen3 guifg=DarkGreen'
+})
+
+vim.api.nvim_create_autocmd('ColorScheme', {
+  pattern = '*',
+  command = 'highlight TabLine ctermbg=DarkGreen ctermfg=LightGreen guibg=Grey23 guifg=DarkSeaGreen'
+})
+
+vim.api.nvim_create_autocmd('ColorScheme', {
+  pattern = '*',
+  command = 'highlight TabLineSel ctermbg=DarkGreen ctermfg=LightGreen guibg=DeepSkyBlue4 guifg=Yellow3'
 })
 
 vim.g.desertrocks_show_whitespace = 1
@@ -179,6 +198,20 @@ vim.keymap.set('n', '\\s', ':tab split<CR>')
 -- so i can keep \n for numbers
 vim.keymap.set('n', '\\p', ':-tabmove<CR>')
 vim.keymap.set('n', '\\P', ':+tabmove<CR>')
+vim.keymap.set('n', '\\[', ':-tabmove<CR>')
+vim.keymap.set('n', '\\]', ':+tabmove<CR>')
+
+-- easy tab switching
+vim.keymap.set('n', '\\1', ':tabn 1<CR>')
+vim.keymap.set('n', '\\2', ':tabn 2<CR>')
+vim.keymap.set('n', '\\3', ':tabn 3<CR>')
+vim.keymap.set('n', '\\4', ':tabn 4<CR>')
+vim.keymap.set('n', '\\5', ':tabn 5<CR>')
+vim.keymap.set('n', '\\6', ':tabn 6<CR>')
+vim.keymap.set('n', '\\7', ':tabn 7<CR>')
+vim.keymap.set('n', '\\8', ':tabn 8<CR>')
+vim.keymap.set('n', '\\9', ':tabn 9<CR>')
+vim.keymap.set('n', '\\0', ':tabn 0<CR>')
 
 -- faster quit
 vim.keymap.set('n', '\\q', ':q<CR>')
