@@ -1,0 +1,71 @@
+# ('ANSIBlackColor', '#000000')
+# ('ANSIBlueColor', '#00009c')
+# ('ANSIBrightBlackColor', '#515352')
+# ('ANSIBrightBlueColor', '#003bff')
+# ('ANSIBrightCyanColor', '#19e4df')
+# ('ANSIBrightGreenColor', '#19d600')
+# ('ANSIBrightMagentaColor', '#db00df')
+# ('ANSIBrightRedColor', '#dc3108')
+# ('ANSIBrightWhiteColor', '#e6eee7')
+# ('ANSIBrightYellowColor', '#dde406')
+# ('ANSICyanColor', '#0e938c')
+# ('ANSIGreenColor', '#0e9a00')
+# ('ANSIMagentaColor', '#a000a3')
+# ('ANSIRedColor', '#850000')
+# ('ANSIWhiteColor', '#ced5d3')
+# ('ANSIYellowColor', '#a5a900')
+# ('BackgroundColor', '#000000')
+# ('CursorColor', '#fed50091')
+# ('SelectionColor', '#3f413f')
+# ('TextBoldColor', '#1010000')
+# ('TextColor', '#eff2ee')
+
+command = "/opt/homebrew/bin/bash -l"
+
+font-family = ""
+font-family = "SF Mono Regular"
+font-feature = "-calt"
+font-feature = "-liga"
+font-feature = "-dlig"
+font-size = 14
+
+cursor-color = f8db4a
+cursor-opacity = 0.569
+cursor-text = 15cfbc
+
+minimum-contrast = 3.0
+
+# The syntax is "key = value". The whitespace around the equals doesn't matter.
+background = 000000
+foreground = eff2ee
+
+selection-background = 2159a3
+selection-foreground = fff705
+
+# Colors can be changed by setting the 16 colors of `palette`, which each color
+# being defined as regular and bold.
+#
+# black
+palette = 0=#000000
+palette = 8=#666666
+# red
+palette = 1=#850000
+palette = 9=#dc3108
+# green
+palette = 2=#0e9a00
+palette = 10=#19d600
+# yellow
+palette = 3=#a5a900
+palette = 11=#dde406
+# blue
+palette = 4=#00009c
+palette = 12=#003bff
+# purple
+palette = 5=#a000a3
+palette = 13=#db00df
+# aqua
+palette = 6=#0e938c
+palette = 14=#19e4df
+# white
+palette = 7=#ced5d3
+palette = 15=#e6eee7
