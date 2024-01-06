@@ -1,0 +1,27 @@
+[colors.bright]
+black = "#666666"
+blue = "#003bff"
+cyan = "#19e4df"
+green = "#19d600"
+magenta = "#db00df"
+red = "#dc3108"
+white = "#e6eee7"
+yellow = "#dde406"
+
+[colors.normal]
+black = "#000000"
+blue = "#00009c"
+cyan = "#0e938c"
+green = "#0e9a00"
+magenta = "#a000a3"
+red = "#850000"
+white = "#ced5d3"
+yellow = "#a5a900"
+
+[colors.primary]
+background = "#000000"
+foreground = "#eff2ee"
+
+[shell]
+args = ["--login"]
+program = "/bin/bash"
