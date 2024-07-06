@@ -216,10 +216,10 @@ vim.keymap.set('n', '\\0', ':tabn 0<CR>')
 -- faster quit
 vim.keymap.set('n', '\\q', ':q<CR>')
 
--- okay this is heaps useful - it opens a new tab with the directory browser
--- in the same directory as where the buffer was opened
--- courtesy of /u/-romainl- (and same nick on freenode vim)
-vim.keymap.set('n', '\\.', ':tabedit %:p:h<CR>')
+-- courtesy of JoshTriplett:
+--   https://news.ycombinator.com/item?id=40839361
+vim.keymap.set('n', '\\.', ':Texplore<CR>')
+vim.keymap.set('n', '\\v', ':Vexplore<CR>')
 
 -- convenient to open a new tab instead of :tabnew
 vim.keymap.set('n', '\\t', ':tabnew<CR>')
