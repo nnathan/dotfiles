@@ -44,14 +44,22 @@ require('packer').startup(function(use)
     after = 'nvim-treesitter',
   }
 
+  -- Autoformatting
+  use {
+    'stevearc/conform.nvim',
+    config = function()
+      require("conform").setup()
+    end,
+  }
+
   -- Git related plugins
   use 'tpope/vim-fugitive'
   use 'lewis6991/gitsigns.nvim'
 
   use 'nnathan/desertrocks'
   use 'nvim-lualine/lualine.nvim' -- Fancier statusline
-  use 'numToStr/Comment.nvim' -- "gc" to comment visual regions/lines
-  use 'tpope/vim-sleuth' -- Detect tabstop and shiftwidth automatically
+  use 'numToStr/Comment.nvim'     -- "gc" to comment visual regions/lines
+  use 'tpope/vim-sleuth'          -- Detect tabstop and shiftwidth automatically
 
   -- Fuzzy Finder (files, lsp, etc)
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x', requires = { 'nvim-lua/plenary.nvim' } }
@@ -156,11 +164,12 @@ vim.g.desertrocks_show_whitespace = 1
 vim.cmd [[colorscheme desertrocks]]
 if vim.g.desertrocks_show_whitespace then
   local ag = vim.api.nvim_create_augroup('desertrocks_show_whitespace', { clear = true })
-  vim.api.nvim_create_autocmd('VimEnter', { -- using VimEnter instead of Syntax because nvim sets syntax on and the event never triggers/it deletes the existing autocommands
-    pattern = '*',
-    command = [[syntax match Tab /\v\t/ containedin=ALL | syntax match TrailingWS /\v\s\ze\s*$/ containedin=ALL]],
-    group = ag,
-  })
+  vim.api.nvim_create_autocmd('VimEnter',
+    { -- using VimEnter instead of Syntax because nvim sets syntax on and the event never triggers/it deletes the existing autocommands
+      pattern = '*',
+      command = [[syntax match Tab /\v\t/ containedin=ALL | syntax match TrailingWS /\v\s\ze\s*$/ containedin=ALL]],
+      group = ag,
+    })
   vim.cmd [[highlight Tab ctermbg=240 guibg=Grey50]]
   vim.cmd [[highlight TrailingWS ctermbg=203 guibg=IndianRed1]]
 end
@@ -229,6 +238,9 @@ vim.keymap.set('n', '\\n', ':set nu!<CR>')
 
 -- toggle gutter/signcolumn
 vim.keymap.set('n', '\\g', function() vim.wo.signcolumn = vim.wo.signcolumn == 'no' and 'yes' or 'no' end)
+
+-- lsp format
+vim.keymap.set('n', '\\f', ':lua vim.lsp.buf.format()<CR>')
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -516,7 +528,31 @@ function _G.toggle_diagnostics()
   end
 end
 
-vim.api.nvim_set_keymap('n', '\\d', ':call v:lua.toggle_diagnostics()<CR>',  {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '\\d', ':call v:lua.toggle_diagnostics()<CR>', { noremap = true, silent = true })
+
+
+require("conform").setup({
+  formatters_by_ft = {
+    lua = { "stylua" },
+    -- Conform will run multiple formatters sequentially
+    python = { "isort", "black" },
+    -- You can customize some of the format options for the filetype (:help conform.format)
+    rust = { "rustfmt", lsp_format = "fallback" },
+    -- Conform will run the first available formatter
+    javascript = { "prettierd", "prettier", stop_after_first = true },
+    -- Conform for gopls
+    go = { "gofumpt" },
+  },
+})
+
+-- setup format on save
+require("conform").setup({
+  format_on_save = {
+    -- These options will be passed to conform.format()
+    timeout_ms = 500,
+    lsp_format = "fallback",
+  },
+})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
