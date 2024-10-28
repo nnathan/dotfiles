@@ -1,97 +1,112 @@
--- Install packer
-local install_path = vim.fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
-local is_bootstrap = false
-if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-	is_bootstrap = true
-	vim.fn.system({ "git", "clone", "--depth", "1", "https://github.com/wbthomason/packer.nvim", install_path })
-	vim.cmd([[packadd packer.nvim]])
-end
+-- [[ Install `lazy.nvim` plugin manager ]]
+--    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+	local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+	if vim.v.shell_error ~= 0 then
+		error("Error cloning lazy.nvim:\n" .. out)
+	end
+end ---@diagnostic disable-next-line: undefined-field
+vim.opt.rtp:prepend(lazypath)
 
-require("packer").startup(function(use)
-	-- Package manager
-	use("wbthomason/packer.nvim")
+-- [[ Configure and install plugins ]]
+--
+--  To check the current status of your plugins, run
+--    :Lazy
+--
+--  You can press `?` in this menu for help. Use `:q` to close the window
+--
+--  To update plugins you can run
+--    :Lazy update
+--
+-- NOTE: Here is where you install your plugins.
+require("lazy").setup({
+	{
+		-- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
+		-- used for completion, annotations and signatures of Neovim apis
+		"folke/lazydev.nvim",
+		ft = "lua",
+		opts = {
+			library = {
+				-- Load luvit types when the `vim.uv` word is found
+				{ path = "luvit-meta/library", words = { "vim%.uv" } },
+			},
+		},
+	},
 
-	use({ -- LSP Configuration & Plugins
+	{ -- LSP Configuration & Plugins
 		"neovim/nvim-lspconfig",
-		requires = {
+		dependencies = {
 			-- Automatically install LSPs to stdpath for neovim
-			"williamboman/mason.nvim",
+			{ "williamboman/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
 			"williamboman/mason-lspconfig.nvim",
+			"WhoIsSethDaniel/mason-tool-installer.nvim",
 
 			-- Useful status updates for LSP
 			-- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-			{ "j-hui/fidget.nvim", tag = "legacy", opts = {} },
+			{ "j-hui/fidget.nvim", opts = {} },
 
-			-- Additional lua configuration, makes nvim stuff amazing
-			"folke/neodev.nvim",
+			-- Allows extra capabilities provided by nvim-cmp
+			"hrsh7th/cmp-nvim-lsp",
 		},
-	})
+	},
 
-	use({ -- Autocompletion
+	{ -- Autocompletion
 		"hrsh7th/nvim-cmp",
-		requires = { "hrsh7th/cmp-nvim-lsp", "L3MON4D3/LuaSnip", "saadparwaiz1/cmp_luasnip" },
-	})
+		dependencies = {
+			"L3MON4D3/LuaSnip",
+			build = (function()
+				-- Build Step is needed for regex support in snippets.
+				-- This step is not supported in many windows environments.
+				-- Remove the below condition to re-enable on windows.
+				if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
+					return
+				end
+				return "make install_jsregexp"
+			end)(),
 
-	use({ -- Highlight, edit, and navigate code
+			"saadparwaiz1/cmp_luasnip",
+			"hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/cmp-path",
+		},
+	},
+
+	{ -- Highlight, edit, and navigate code
 		"nvim-treesitter/nvim-treesitter",
-		run = function()
-			pcall(require("nvim-treesitter.install").update({ with_sync = true }))
-		end,
-	})
-
-	use({ -- Additional text objects via treesitter
-		"nvim-treesitter/nvim-treesitter-textobjects",
-		after = "nvim-treesitter",
-	})
+		build = ":TSUpdate",
+		main = "nvim-treesitter.configs",
+	},
 
 	-- Autoformatting
-	use("stevearc/conform.nvim")
+	"stevearc/conform.nvim",
 
 	-- Git related plugins
-	use("tpope/vim-fugitive")
-	use("lewis6991/gitsigns.nvim")
+	"tpope/vim-fugitive",
+	"lewis6991/gitsigns.nvim",
 
-	use("nnathan/desertrocks")
-	use("nvim-lualine/lualine.nvim") -- Fancier statusline
-	use("numToStr/Comment.nvim") -- "gc" to comment visual regions/lines
-	use("tpope/vim-sleuth") -- Detect tabstop and shiftwidth automatically
+	"nnathan/desertrocks",
+	"nvim-lualine/lualine.nvim", -- Fancier statusline
+	"numToStr/Comment.nvim", -- "gc" to comment visual regions/lines
+	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 
 	-- Fuzzy Finder (files, lsp, etc)
-	use({ "nvim-telescope/telescope.nvim", branch = "0.1.x", requires = { "nvim-lua/plenary.nvim" } })
-
-	-- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
-	use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make", cond = vim.fn.executable("make") == 1 })
-
-	-- Add custom plugins to packer from ~/.config/nvim/lua/custom/plugins.lua
-	local has_plugins, plugins = pcall(require, "custom.plugins")
-	if has_plugins then
-		plugins(use)
-	end
-
-	if is_bootstrap then
-		require("packer").sync()
-	end
-end)
-
--- When we are bootstrapping a configuration, it doesn't
--- make sense to execute the rest of the init.lua.
---
--- You'll need to restart nvim, and then it will work.
-if is_bootstrap then
-	print("==================================")
-	print("    Plugins are being installed")
-	print("    Wait until Packer completes,")
-	print("       then restart nvim")
-	print("==================================")
-	return
-end
-
--- Automatically source and re-compile packer whenever you save this init.lua
-local packer_group = vim.api.nvim_create_augroup("Packer", { clear = true })
-vim.api.nvim_create_autocmd("BufWritePost", {
-	command = "source <afile> | silent! LspStop | silent! LspStart | PackerCompile",
-	group = packer_group,
-	pattern = vim.fn.expand("$MYVIMRC"),
+	{
+		"nvim-telescope/telescope.nvim",
+		branch = "0.1.x",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			{
+				"nvim-telescope/telescope-fzf-native.nvim",
+				build = "make",
+				cond = function()
+					return vim.fn.executable("make") == 1
+				end,
+			},
+			"nvim-telescope/telescope-ui-select.nvim",
+			{ "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
+		},
+	},
 })
 
 -- [[ Setting options ]]
@@ -313,6 +328,7 @@ vim.keymap.set("n", "<leader>sd", require("telescope.builtin").diagnostics, { de
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
+---@diagnostic disable-next-line: missing-fields
 require("nvim-treesitter.configs").setup({
 	-- Add languages to be installed here that you want installed for treesitter
 	ensure_installed = { "c", "cpp", "go", "lua", "python", "rust", "tsx", "typescript", "vimdoc", "vim" },
@@ -326,50 +342,6 @@ require("nvim-treesitter.configs").setup({
 			node_incremental = "<c-space>",
 			scope_incremental = "<c-s>",
 			node_decremental = "<c-backspace>",
-		},
-	},
-	textobjects = {
-		select = {
-			enable = true,
-			lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-			keymaps = {
-				-- You can use the capture groups defined in textobjects.scm
-				["aa"] = "@parameter.outer",
-				["ia"] = "@parameter.inner",
-				["af"] = "@function.outer",
-				["if"] = "@function.inner",
-				["ac"] = "@class.outer",
-				["ic"] = "@class.inner",
-			},
-		},
-		move = {
-			enable = true,
-			set_jumps = true, -- whether to set jumps in the jumplist
-			goto_next_start = {
-				["]m"] = "@function.outer",
-				["]]"] = "@class.outer",
-			},
-			goto_next_end = {
-				["]M"] = "@function.outer",
-				["]["] = "@class.outer",
-			},
-			goto_previous_start = {
-				["[m"] = "@function.outer",
-				["[["] = "@class.outer",
-			},
-			goto_previous_end = {
-				["[M"] = "@function.outer",
-				["[]"] = "@class.outer",
-			},
-		},
-		swap = {
-			enable = true,
-			swap_next = {
-				["<leader>a"] = "@parameter.inner",
-			},
-			swap_previous = {
-				["<leader>A"] = "@parameter.inner",
-			},
 		},
 	},
 })
@@ -435,6 +407,7 @@ local servers = {
 	gopls = {},
 	rust_analyzer = {},
 	pylsp = {},
+	vimls = {},
 
 	lua_ls = {
 		Lua = {
@@ -443,9 +416,6 @@ local servers = {
 		},
 	},
 }
-
--- Setup neovim lua configuration
-require("neodev").setup()
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -458,7 +428,7 @@ require("mason").setup()
 local mason_lspconfig = require("mason-lspconfig")
 
 mason_lspconfig.setup({
-	ensure_installed = vim.tbl_keys(servers),
+	ensure_installed = vim.tbl_keys(servers or {}),
 })
 
 mason_lspconfig.setup_handlers({
@@ -469,6 +439,64 @@ mason_lspconfig.setup_handlers({
 			settings = servers[server_name],
 		})
 	end,
+})
+
+local ensure_installed = vim.tbl_keys(servers or {})
+
+vim.list_extend(ensure_installed, {
+	"black",
+	"isort",
+	"stylua",
+	"shellcheck",
+	"gofumpt",
+	"goimports",
+	"rust-analyzer",
+	"shfmt",
+	"stylua",
+})
+
+require("mason-tool-installer").setup({
+
+	-- a list of all tools you want to ensure are installed upon
+	-- start
+	ensure_installed = ensure_installed,
+
+	-- if set to true this will check each tool for updates. If updates
+	-- are available the tool will be updated. This setting does not
+	-- affect :MasonToolsUpdate or :MasonToolsInstall.
+	-- Default: false
+	auto_update = false,
+
+	-- automatically install / update on startup. If set to false nothing
+	-- will happen on startup. You can use :MasonToolsInstall or
+	-- :MasonToolsUpdate to install tools and check for updates.
+	-- Default: true
+	run_on_start = true,
+
+	-- set a delay (in ms) before the installation starts. This is only
+	-- effective if run_on_start is set to true.
+	-- e.g.: 5000 = 5 second delay, 10000 = 10 second delay, etc...
+	-- Default: 0
+	start_delay = 0,
+
+	-- Only attempt to install if 'debounce_hours' number of hours has
+	-- elapsed since the last time Neovim was started. This stores a
+	-- timestamp in a file named stdpath('data')/mason-tool-installer-debounce.
+	-- This is only relevant when you are using 'run_on_start'. It has no
+	-- effect when running manually via ':MasonToolsInstall' etc....
+	-- Default: nil
+	debounce_hours = 1, -- at least 5 hours between attempts to install/update
+
+	-- By default all integrations are enabled. If you turn on an integration
+	-- and you have the required module(s) installed this means you can use
+	-- alternative names, supplied by the modules, for the thing that you want
+	-- to install. If you turn off the integration (by setting it to false) you
+	-- cannot use these alternative names. It also suppresses loading of those
+	-- module(s) (assuming any are installed) which is sometimes wanted when
+	-- doing lazy loading.
+	integrations = {
+		["mason-lspconfig"] = true,
+	},
 })
 
 -- nvim-cmp setup
@@ -509,8 +537,14 @@ cmp.setup({
 		end, { "i", "s" }),
 	}),
 	sources = {
+		{
+			name = "lazydev",
+			-- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
+			group_index = 0,
+		},
 		{ name = "nvim_lsp" },
 		{ name = "luasnip" },
+		{ name = "path" },
 	},
 })
 
@@ -519,7 +553,7 @@ vim.g.diagnostics_active = true
 function _G.toggle_diagnostics()
 	if vim.g.diagnostics_active then
 		vim.g.diagnostics_active = false
-		vim.diagnostic.disable()
+		vim.diagnostic.enable(false)
 	else
 		vim.g.diagnostics_active = true
 		vim.diagnostic.enable()
@@ -538,7 +572,7 @@ require("conform").setup({
 		-- Conform will run the first available formatter
 		javascript = { "prettierd", "prettier", stop_after_first = true },
 		-- Conform for gopls
-		go = { "gofumpt" },
+		go = { "goimports", "gofumpt" },
 	},
 	format_on_save = {
 		-- These options will be passed to conform.format()
