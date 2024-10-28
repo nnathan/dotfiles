@@ -558,11 +558,17 @@ require("conform").setup({
 	},
 })
 
+--au FileType go set shiftwidth=4
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "go",
 	callback = function()
 		vim.opt_local.tabstop = 4
 	end,
 })
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "lua",
+	callback = function()
+		vim.opt_local.tabstop = 2
+	end,
+})
