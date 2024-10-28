@@ -45,12 +45,7 @@ require("packer").startup(function(use)
 	})
 
 	-- Autoformatting
-	use({
-		"stevearc/conform.nvim",
-		config = function()
-			require("conform").setup()
-		end,
-	})
+	use("stevearc/conform.nvim")
 
 	-- Git related plugins
 	use("tpope/vim-fugitive")
@@ -451,7 +446,7 @@ local servers = {
 
 -- Setup neovim lua configuration
 require("neodev").setup()
---
+
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
@@ -545,10 +540,6 @@ require("conform").setup({
 		-- Conform for gopls
 		go = { "gofumpt" },
 	},
-})
-
--- setup format on save
-require("conform").setup({
 	format_on_save = {
 		-- These options will be passed to conform.format()
 		-- timeout for 10s for mac where first exec of binary
