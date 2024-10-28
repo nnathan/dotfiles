@@ -558,5 +558,11 @@ require("conform").setup({
 	},
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "go",
+	callback = function()
+		vim.opt_local.tabstop = 4
+	end,
+})
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2
