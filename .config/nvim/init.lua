@@ -1,115 +1,4 @@
--- [[ Install `lazy.nvim` plugin manager ]]
---    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-	local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-	if vim.v.shell_error ~= 0 then
-		error("Error cloning lazy.nvim:\n" .. out)
-	end
-end ---@diagnostic disable-next-line: undefined-field
-vim.opt.rtp:prepend(lazypath)
-
--- [[ Configure and install plugins ]]
---
---  To check the current status of your plugins, run
---    :Lazy
---
---  You can press `?` in this menu for help. Use `:q` to close the window
---
---  To update plugins you can run
---    :Lazy update
---
--- NOTE: Here is where you install your plugins.
-require("lazy").setup({
-	{ -- LSP Configuration & Plugins
-		"neovim/nvim-lspconfig",
-		dependencies = {
-			-- Automatically install LSPs to stdpath for neovim
-			{ "williamboman/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
-			"williamboman/mason-lspconfig.nvim",
-			"WhoIsSethDaniel/mason-tool-installer.nvim",
-
-			-- Useful status updates for LSP
-			-- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-			{ "j-hui/fidget.nvim", opts = {} },
-
-			-- Allows extra capabilities provided by nvim-cmp
-			"hrsh7th/cmp-nvim-lsp",
-
-			{
-				-- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-				-- used for completion, annotations and signatures of Neovim apis
-				"folke/lazydev.nvim",
-				ft = "lua",
-				opts = {
-					library = {
-						-- Load luvit types when the `vim.uv` word is found
-						{ path = "luvit-meta/library", words = { "vim%.uv" } },
-					},
-				},
-			},
-		},
-	},
-
-	{ -- Autocompletion
-		"hrsh7th/nvim-cmp",
-		dependencies = {
-			"L3MON4D3/LuaSnip",
-			build = (function()
-				-- Build Step is needed for regex support in snippets.
-				-- This step is not supported in many windows environments.
-				-- Remove the below condition to re-enable on windows.
-				if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
-					return
-				end
-				return "make install_jsregexp"
-			end)(),
-
-			"saadparwaiz1/cmp_luasnip",
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-path",
-		},
-	},
-
-	{ -- Highlight, edit, and navigate code
-		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		main = "nvim-treesitter.configs",
-	},
-
-	-- Autoformatting
-	"stevearc/conform.nvim",
-
-	-- Git related plugins
-	"tpope/vim-fugitive",
-	"lewis6991/gitsigns.nvim",
-
-	"nnathan/desertrocks",
-	"nvim-lualine/lualine.nvim", -- Fancier statusline
-	"numToStr/Comment.nvim", -- "gc" to comment visual regions/lines
-	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
-
-	-- Fuzzy Finder (files, lsp, etc)
-	{
-		"nvim-telescope/telescope.nvim",
-		branch = "0.1.x",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			{
-				"nvim-telescope/telescope-fzf-native.nvim",
-				build = "make",
-				cond = function()
-					return vim.fn.executable("make") == 1
-				end,
-			},
-			"nvim-telescope/telescope-ui-select.nvim",
-			{ "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
-		},
-	},
-})
-
--- [[ Setting options ]]
+-- {{{ [[ Setting options ]]
 -- See `:help vim.o`
 
 -- Set highlight on search
@@ -138,58 +27,12 @@ vim.wo.signcolumn = "auto"
 -- Set colorscheme
 vim.o.termguicolors = true
 
--- pmenu colours
-
-vim.api.nvim_create_autocmd("ColorScheme", {
-	pattern = "*",
-	command = "highlight Pmenu ctermbg=60 ctermfg=81 guibg=MediumPurple4 guifg=SteelBlue1",
-})
-vim.api.nvim_create_autocmd("ColorScheme", {
-	pattern = "*",
-	command = "highlight PmenuSel ctermbg=60 ctermfg=50 guibg=MediumPurple4 guifg=Cyan2",
-})
-vim.api.nvim_create_autocmd("ColorScheme", {
-	pattern = "*",
-	command = "highlight Search ctermbg=24 ctermfg=49 guibg=DeepSkyBlue4 guifg=MediumSpringGreen",
-})
-
--- tabmenu colours
-
-vim.api.nvim_create_autocmd("ColorScheme", {
-	pattern = "*",
-	command = "highlight TabLineFill ctermbg=DarkGreen ctermfg=LightGreen guibg=SeaGreen3 guifg=DarkGreen",
-})
-
-vim.api.nvim_create_autocmd("ColorScheme", {
-	pattern = "*",
-	command = "highlight TabLine ctermbg=DarkGreen ctermfg=LightGreen guibg=Grey23 guifg=DarkSeaGreen",
-})
-
-vim.api.nvim_create_autocmd("ColorScheme", {
-	pattern = "*",
-	command = "highlight TabLineSel ctermbg=DarkGreen ctermfg=LightGreen guibg=DeepSkyBlue4 guifg=Yellow3",
-})
-
-vim.g.desertrocks_show_whitespace = 1
-vim.cmd([[colorscheme desertrocks]])
-if vim.g.desertrocks_show_whitespace then
-	local ag = vim.api.nvim_create_augroup("desertrocks_show_whitespace", { clear = true })
-	vim.api.nvim_create_autocmd(
-		"VimEnter",
-		{ -- using VimEnter instead of Syntax because nvim sets syntax on and the event never triggers/it deletes the existing autocommands
-			pattern = "*",
-			command = [[syntax match Tab /\v\t/ containedin=ALL | syntax match TrailingWS /\v\s\ze\s*$/ containedin=ALL]],
-			group = ag,
-		}
-	)
-	vim.cmd([[highlight Tab ctermbg=240 guibg=Grey50]])
-	vim.cmd([[highlight TrailingWS ctermbg=203 guibg=IndianRed1]])
-end
-
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = "menuone,noselect"
 
--- [[ Basic Keymaps ]]
+-- }}}
+
+-- {{{ [[ Basic Keymaps ]]
 -- Set \ as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
@@ -256,7 +99,9 @@ end)
 -- lsp format
 vim.keymap.set("n", "\\f", ":lua require('conform').format()<CR>")
 
--- [[ Highlight on yank ]]
+-- }}}
+
+-- {{{ [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -266,32 +111,244 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	group = highlight_group,
 	pattern = "*",
 })
+-- }}}
+
+-- {{{ [[ default tabstops ]]
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "go",
+	callback = function()
+		vim.opt_local.tabstop = 4
+	end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "lua",
+	callback = function()
+		vim.opt_local.tabstop = 2
+	end,
+})
+-- }}}
+
+-- {{{ [[ Install `lazy.nvim` plugin manager ]]
+--    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+---@diagnostic disable-next-line: undefined-field
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+	local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+	if vim.v.shell_error ~= 0 then
+		error("Error cloning lazy.nvim:\n" .. out)
+	end
+end
+vim.opt.rtp:prepend(lazypath)
+-- }}}
+
+-- {{{ [[ Configure and install plugins ]]
+--
+--  To check the current status of your plugins, run
+--    :Lazy
+--
+--  You can press `?` in this menu for help. Use `:q` to close the window
+--
+--  To update plugins you can run
+--    :Lazy update
+--
+-- NOTE: Here is where you install your plugins.
+require("lazy").setup({
+	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+	{
+		"lewis6991/gitsigns.nvim",
+		opts = {
+			signs = {
+				add = { text = "+" },
+				change = { text = "~" },
+				delete = { text = "_" },
+				topdelete = { text = "‾" },
+				changedelete = { text = "~" },
+			},
+		},
+	},
+	{
+		"nvim-lualine/lualine.nvim", -- Fancier statusline
+		opts = {
+			options = {
+				icons_enabled = false,
+				theme = "onedark",
+				component_separators = "|",
+				section_separators = "",
+			},
+		},
+	},
+	{ -- LSP Configuration & Plugins
+		"neovim/nvim-lspconfig",
+		dependencies = {
+			-- Automatically install LSPs to stdpath for neovim
+			{ "williamboman/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
+			"williamboman/mason-lspconfig.nvim",
+			"WhoIsSethDaniel/mason-tool-installer.nvim",
+
+			-- Useful status updates for LSP
+			-- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
+			{ "j-hui/fidget.nvim", opts = {} },
+
+			-- Allows extra capabilities provided by nvim-cmp
+			"hrsh7th/cmp-nvim-lsp",
+
+			{
+				-- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
+				-- used for completion, annotations and signatures of Neovim apis
+				"folke/lazydev.nvim",
+				ft = "lua",
+				opts = {
+					library = {
+						-- Load luvit types when the `vim.uv` word is found
+						{ path = "luvit-meta/library", words = { "vim%.uv" } },
+					},
+				},
+			},
+		},
+	},
+
+	{ -- Autocompletion
+		"hrsh7th/nvim-cmp",
+		dependencies = {
+			"L3MON4D3/LuaSnip",
+			build = (function()
+				-- Build Step is needed for regex support in snippets.
+				-- This step is not supported in many windows environments.
+				-- Remove the below condition to re-enable on windows.
+				if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
+					return
+				end
+				return "make install_jsregexp"
+			end)(),
+
+			"saadparwaiz1/cmp_luasnip",
+			"hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/cmp-path",
+		},
+		config = function()
+			-- nvim-cmp setup
+			local cmp = require("cmp")
+			local luasnip = require("luasnip")
+
+			cmp.setup({
+				snippet = {
+					expand = function(args)
+						luasnip.lsp_expand(args.body)
+					end,
+				},
+				mapping = cmp.mapping.preset.insert({
+					["<C-d>"] = cmp.mapping.scroll_docs(-4),
+					["<C-f>"] = cmp.mapping.scroll_docs(4),
+					["<C-Space>"] = cmp.mapping.complete(),
+					["<CR>"] = cmp.mapping.confirm({
+						behavior = cmp.ConfirmBehavior.Replace,
+						select = true,
+					}),
+					["<Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_next_item()
+						elseif luasnip.expand_or_jumpable() then
+							luasnip.expand_or_jump()
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+					["<S-Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_prev_item()
+						elseif luasnip.jumpable(-1) then
+							luasnip.jump(-1)
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+				}),
+				sources = {
+					{
+						name = "lazydev",
+						-- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
+						group_index = 0,
+					},
+					{ name = "nvim_lsp" },
+					{ name = "luasnip" },
+					{ name = "path" },
+				},
+			})
+		end,
+	},
+
+	{ -- Highlight, edit, and navigate code
+		"nvim-treesitter/nvim-treesitter",
+		build = ":TSUpdate",
+		main = "nvim-treesitter.configs",
+	},
+
+	-- Autoformatting
+	{
+		"stevearc/conform.nvim",
+		opts = {
+			formatters_by_ft = {
+				lua = { "stylua" },
+				-- Conform will run multiple formatters sequentially
+				python = { "isort", "black" },
+				-- You can customize some of the format options for the filetype (:help conform.format)
+				rust = { "rustfmt", lsp_format = "fallback" },
+				-- Conform will run the first available formatter
+				javascript = { "prettierd", "prettier", stop_after_first = true },
+				-- Conform for gopls
+				go = { "goimports", "gofumpt" },
+			},
+			format_on_save = {
+				-- These options will be passed to conform.format()
+				-- timeout for 10s for mac where first exec of binary
+				-- takes awhile
+				timeout_ms = 10000,
+				lsp_format = "fallback",
+			},
+		},
+	},
+
+	-- Git related plugins
+	"tpope/vim-fugitive",
+
+	"nnathan/desertrocks",
+	"numToStr/Comment.nvim", -- "gc" to comment visual regions/lines
+
+	-- Fuzzy Finder (files, lsp, etc)
+	{
+		"nvim-telescope/telescope.nvim",
+		branch = "0.1.x",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			{
+				"nvim-telescope/telescope-fzf-native.nvim",
+				build = "make",
+				cond = function()
+					return vim.fn.executable("make") == 1
+				end,
+			},
+			"nvim-telescope/telescope-ui-select.nvim",
+			{ "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
+		},
+	},
+})
+-- }}}
 
 -- Set lualine as statusline
 -- See `:help lualine.txt`
-require("lualine").setup({
-	options = {
-		icons_enabled = false,
-		theme = "onedark",
-		component_separators = "|",
-		section_separators = "",
-	},
-})
+--require("lualine").setup({
+--	options = {
+--		icons_enabled = false,
+--		theme = "onedark",
+--		component_separators = "|",
+--		section_separators = "",
+--	},
+--})
 
 -- Enable Comment.nvim
 require("Comment").setup()
-
--- Gitsigns
--- See `:help gitsigns.txt`
-require("gitsigns").setup({
-	signs = {
-		add = { text = "+" },
-		change = { text = "~" },
-		delete = { text = "_" },
-		topdelete = { text = "‾" },
-		changedelete = { text = "~" },
-	},
-})
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
@@ -332,8 +389,12 @@ vim.keymap.set("n", "<leader>sd", require("telescope.builtin").diagnostics, { de
 require("nvim-treesitter.configs").setup({
 	-- Add languages to be installed here that you want installed for treesitter
 	ensure_installed = { "c", "cpp", "go", "lua", "python", "rust", "tsx", "typescript", "vimdoc", "vim" },
+	auto_install = false,
 
-	highlight = { enable = true },
+	highlight = {
+		enable = true,
+		additional_vim_regex_highlighting = true,
+	},
 	indent = { enable = true, disable = { "python" } },
 	incremental_selection = {
 		enable = true,
@@ -499,55 +560,6 @@ require("mason-tool-installer").setup({
 	},
 })
 
--- nvim-cmp setup
-local cmp = require("cmp")
-local luasnip = require("luasnip")
-
-cmp.setup({
-	snippet = {
-		expand = function(args)
-			luasnip.lsp_expand(args.body)
-		end,
-	},
-	mapping = cmp.mapping.preset.insert({
-		["<C-d>"] = cmp.mapping.scroll_docs(-4),
-		["<C-f>"] = cmp.mapping.scroll_docs(4),
-		["<C-Space>"] = cmp.mapping.complete(),
-		["<CR>"] = cmp.mapping.confirm({
-			behavior = cmp.ConfirmBehavior.Replace,
-			select = true,
-		}),
-		["<Tab>"] = cmp.mapping(function(fallback)
-			if cmp.visible() then
-				cmp.select_next_item()
-			elseif luasnip.expand_or_jumpable() then
-				luasnip.expand_or_jump()
-			else
-				fallback()
-			end
-		end, { "i", "s" }),
-		["<S-Tab>"] = cmp.mapping(function(fallback)
-			if cmp.visible() then
-				cmp.select_prev_item()
-			elseif luasnip.jumpable(-1) then
-				luasnip.jump(-1)
-			else
-				fallback()
-			end
-		end, { "i", "s" }),
-	}),
-	sources = {
-		{
-			name = "lazydev",
-			-- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
-			group_index = 0,
-		},
-		{ name = "nvim_lsp" },
-		{ name = "luasnip" },
-		{ name = "path" },
-	},
-})
-
 vim.g.diagnostics_active = true
 
 function _G.toggle_diagnostics()
@@ -562,38 +574,51 @@ end
 
 vim.api.nvim_set_keymap("n", "\\d", ":call v:lua.toggle_diagnostics()<CR>", { noremap = true, silent = true })
 
-require("conform").setup({
-	formatters_by_ft = {
-		lua = { "stylua" },
-		-- Conform will run multiple formatters sequentially
-		python = { "isort", "black" },
-		-- You can customize some of the format options for the filetype (:help conform.format)
-		rust = { "rustfmt", lsp_format = "fallback" },
-		-- Conform will run the first available formatter
-		javascript = { "prettierd", "prettier", stop_after_first = true },
-		-- Conform for gopls
-		go = { "goimports", "gofumpt" },
-	},
-	format_on_save = {
-		-- These options will be passed to conform.format()
-		-- timeout for 10s for mac where first exec of binary
-		-- takes awhile
-		timeout_ms = 10000,
-		lsp_format = "fallback",
-	},
+vim.api.nvim_set_hl(0, "@lsp.type.comment.cpp", {})
+
+-- {{{ [[pmenu colours]]
+vim.api.nvim_create_autocmd("ColorScheme", {
+	pattern = "*",
+	command = "highlight Pmenu ctermbg=60 ctermfg=81 guibg=MediumPurple4 guifg=SteelBlue1",
+})
+vim.api.nvim_create_autocmd("ColorScheme", {
+	pattern = "*",
+	command = "highlight PmenuSel ctermbg=60 ctermfg=50 guibg=MediumPurple4 guifg=Cyan2",
+})
+vim.api.nvim_create_autocmd("ColorScheme", {
+	pattern = "*",
+	command = "highlight Search ctermbg=24 ctermfg=49 guibg=DeepSkyBlue4 guifg=MediumSpringGreen",
+})
+-- }}}
+
+-- {{{ [[tabmenu colours]]
+vim.api.nvim_create_autocmd("ColorScheme", {
+	pattern = "*",
+	command = "highlight TabLineFill ctermbg=DarkGreen ctermfg=LightGreen guibg=NvimDarkGreen guifg=DarkGreen",
 })
 
---au FileType go set shiftwidth=4
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "go",
-	callback = function()
-		vim.opt_local.tabstop = 4
-	end,
+vim.api.nvim_create_autocmd("ColorScheme", {
+	pattern = "*",
+	command = "highlight TabLine ctermbg=DarkGreen ctermfg=LightGreen guibg=Grey23 guifg=DarkSeaGreen",
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "lua",
-	callback = function()
-		vim.opt_local.tabstop = 2
-	end,
+vim.api.nvim_create_autocmd("ColorScheme", {
+	pattern = "*",
+	command = "highlight TabLineSel ctermbg=DarkGreen ctermfg=LightGreen guibg=DeepSkyBlue4 guifg=Yellow3",
 })
+-- }}}
+
+-- {{{ [[whitespace]]
+local whitespace_ag = vim.api.nvim_create_augroup("show_whitespace", { clear = true })
+vim.api.nvim_create_autocmd({ "VimEnter" }, {
+	pattern = "*",
+	group = whitespace_ag,
+	command = [[ syntax match Tab /\v\t/ containedin=ALL | syntax match TrailingWS /\v\s\ze\s*$/ containedin=ALL ]],
+})
+vim.cmd.highlight({ "Tab", "ctermfg=234 guibg=Grey40" })
+vim.cmd.highlight({ "TrailingWS", "ctermfg=203 guibg=IndianRed1" })
+-- }}}
+
+vim.cmd.colorscheme("default")
+
+-- vim: foldmethod=marker foldmarker={{{,}}}
