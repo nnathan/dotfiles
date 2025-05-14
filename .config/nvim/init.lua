@@ -638,6 +638,12 @@ require("lazy").setup({
 					previewer = false,
 				}))
 			end, { desc = "[/] Fuzzily search in current buffer" })
+			-- live grep should start from current file directory
+			vim.keymap.set("n", "<leader>lg", function()
+				require("telescope.builtin").live_grep({
+					search_dirs = { vim.fn.expand("%:p:h") },
+				})
+			end, { desc = "[L]ive [G]rep in current file's directory" })
 		end,
 	},
 })
