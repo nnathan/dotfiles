@@ -644,6 +644,14 @@ require("lazy").setup({
 					search_dirs = { vim.fn.expand("%:p:h") },
 				})
 			end, { desc = "[L]ive [G]rep in current file's directory" })
+			vim.keymap.set("n", "<leader>gg", function()
+				local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+				local in_git_repo = vim.v.shell_error == 0
+
+				require("telescope.builtin").live_grep({
+					search_dirs = in_git_repo and { git_root } or {},
+				})
+			end, { desc = "[G]it [G]rep repo / entire project" })
 		end,
 	},
 })
