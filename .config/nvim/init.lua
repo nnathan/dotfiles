@@ -634,6 +634,7 @@ require("lazy").setup({
 				require("telescope.builtin").buffers,
 				{ desc = "[ ] Find existing buffers" }
 			)
+			vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "[F]ind [F]iles" })
 			-- Slightly advanced example of overriding default behavior and theme
 			vim.keymap.set("n", "<leader>/", function()
 				-- You can pass additional configuration to Telescope to change the theme, layout, etc.
@@ -656,6 +657,14 @@ require("lazy").setup({
 					search_dirs = in_git_repo and { git_root } or {},
 				})
 			end, { desc = "[G]it [G]rep repo / entire project" })
+			vim.keymap.set("n", "<leader>gf", function()
+				local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+				local in_git_repo = vim.v.shell_error == 0
+
+				require("telescope.builtin").find_files({
+					search_dirs = in_git_repo and { git_root } or {},
+				})
+			end, { desc = "[G]it Find [F]iles" })
 		end,
 	},
 })
