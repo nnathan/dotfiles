@@ -333,7 +333,11 @@ require("lazy").setup({
 				clangd = {},
 				gopls = {},
 				rust_analyzer = {},
-				pylsp = {},
+				ruff = {
+					init_options = {
+						settings = {},
+					},
+				},
 				vimls = {},
 
 				lua_ls = {
@@ -375,8 +379,7 @@ require("lazy").setup({
 			local ensure_installed = vim.tbl_keys(servers or {})
 
 			vim.list_extend(ensure_installed, {
-				"black",
-				"isort",
+				"ruff",
 				"stylua",
 				"shellcheck",
 				"gofumpt",
@@ -384,6 +387,7 @@ require("lazy").setup({
 				"rust-analyzer",
 				"shfmt",
 				"stylua",
+				"google-java-format",
 			})
 
 			require("mason-tool-installer").setup({
@@ -546,13 +550,22 @@ require("lazy").setup({
 			formatters_by_ft = {
 				lua = { "stylua" },
 				-- Conform will run multiple formatters sequentially
-				python = { "isort", "black" },
+				python = {
+					-- To fix auto-fixable lint errors.
+					"ruff_fix",
+					-- To run the Ruff formatter.
+					"ruff_format",
+					-- To organize the imports.
+					"ruff_organize_imports",
+				},
 				-- You can customize some of the format options for the filetype (:help conform.format)
 				rust = { "rustfmt", lsp_format = "fallback" },
 				-- Conform will run the first available formatter
 				javascript = { "prettierd", "prettier", stop_after_first = true },
 				-- Conform for gopls
 				go = { "goimports", "gofumpt" },
+				-- Conform for java
+				java = { "google-java-format" },
 			},
 			format_on_save = {
 				-- These options will be passed to conform.format()
