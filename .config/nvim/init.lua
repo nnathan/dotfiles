@@ -108,7 +108,7 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist)
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
 	callback = function()
-		vim.highlight.on_yank()
+		vim.hl.on_yank()
 	end,
 	group = highlight_group,
 	pattern = "*",
@@ -226,7 +226,7 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({
-	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+	"NMAC427/guess-indent.nvim", -- Detect tabstop and shiftwidth automatically
 	{
 		"lewis6991/gitsigns.nvim",
 		opts = {
@@ -254,8 +254,8 @@ require("lazy").setup({
 		"neovim/nvim-lspconfig",
 		dependencies = {
 			-- Automatically install LSPs to stdpath for neovim
-			{ "williamboman/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
-			"williamboman/mason-lspconfig.nvim",
+			{ "mason-org/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
+			"mason-org/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 
 			-- Useful status updates for LSP
@@ -568,6 +568,7 @@ require("lazy").setup({
 				java = { "google-java-format" },
 			},
 			format_on_save = {
+				disable_filetypes = { "c", "cpp" },
 				-- These options will be passed to conform.format()
 				-- timeout for 10s for mac where first exec of binary
 				-- takes awhile
