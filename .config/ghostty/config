@@ -5,12 +5,14 @@
 ### macos start
 command = "/opt/homebrew/bin/bash -l"
 
-window-width = 146
-window-height = 43
+window-width = 130
+window-height = 38
 
 font-family = ""
 font-family = "SF Mono Regular"
 ### macos end
+
+adjust-cursor-thickness = 300%
 
 gtk-titlebar = false
 
