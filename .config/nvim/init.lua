@@ -156,6 +156,14 @@ vim.keymap.set("n", "\\g", function()
 	vim.wo.signcolumn = vim.wo.signcolumn == "no" and "yes" or "no"
 end)
 
+-- toggle format on save
+vim.g.format_on_save = true
+
+vim.keymap.set("n", "\\w", function()
+	vim.g.format_on_save = vim.g.format_on_save == false and true or false
+	print("format_on_save: " .. tostring(vim.g.format_on_save))
+end)
+
 -- Diagnostic keymaps
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
@@ -773,6 +781,11 @@ require("lazy").setup({
 		opts = {
 			notify_on_error = false,
 			format_on_save = function(bufnr)
+				-- allow toggling format on save
+				if not vim.g.format_on_save then
+					return nil
+				end
+
 				-- Disable "format_on_save lsp_fallback" for languages that don't
 				-- have a well standardized coding style. You can add additional
 				-- languages here or re-enable it for the disabled ones.
