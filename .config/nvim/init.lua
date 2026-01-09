@@ -1,3 +1,6 @@
+-- For Ubuntu first do:
+--   apt -y install golang python3-venv python3-pip npm luarocks clang gcc
+
 -- {{{ [[ Global options ]]
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
