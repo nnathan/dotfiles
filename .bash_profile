@@ -1,5 +1,15 @@
 # always shfmt -i 2 this dealio
 
+# ghostty stuff
+GHOSTTY_SHELL_INTEGRATION_NO_CURSOR="1"
+if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
+  builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/bash/ghostty.bash"
+fi
+
+if [ -f /opt/homebrew/etc/bash_completion.d/ghostty ]; then
+  builtin source /opt/homebrew/etc/bash_completion.d/ghostty
+fi
+
 # i don't need to see my username
 PS1='\h:\W \$ '
 
@@ -76,23 +86,26 @@ export EDITOR=vim
 export GOPATH=$HOME/go
 export PATH=$PATH:/usr/local/sbin:$HOME/.local/bin:$HOME/.local/sbin:${GOPATH//://bin:}/bin
 if [ "$(uname -s)" = Darwin ]; then
-  if [ -d "$HOME/Library/Android/sdk/platform-tools" ]
-  then
+  export PATH=/Applications/Ghostty.app/Contents/MacOS:$PATH
+
+  if [ -d "$HOME/Library/Android/sdk/platform-tools" ]; then
     PATH=$PATH:$HOME/Library/Android/sdk/platform-tools
   fi
 
-  if [ -d "$HOME/Library/Python" ]
-  then
-    while read -r d
-    do
+  if [ -d "$HOME/Library/Python" ]; then
+    while read -r d; do
       PATH=$PATH:$HOME/Library/Python/$d/bin
-    done < <( cd "$HOME/Library/Python" || exit; printf -- "%s\n" * | sort -t "." -k1,1nr -k2,2nr )
+    done < <(
+      cd "$HOME/Library/Python" || exit
+      printf -- "%s\n" * | sort -t "." -k1,1nr -k2,2nr
+    )
   fi
 
   if [ "$(uname -p)" = arm -a -d /opt/homebrew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
   fi
 fi
+
 alias phgrep='cat ~/.persistent_history|grep --color'
 
 export EDITOR=vim
@@ -107,27 +120,23 @@ fi
 
 export JQ_COLORS="1;33:0;39:0;39:0;39:0;32:1;39:1;39"
 
-if type keychain >/dev/null 2>&1; then
+if type keychain >/dev/null 2>&1 && ! grep -qE '^\s+IdentityAgent.*com.1password.*agent.sock' ~/.ssh/config; then
   keychain ~/.ssh/id*[!.][!p][!u][!b]
   # shellcheck source=/dev/null # this is a linter directive
   . ~/.keychain/"${HOSTNAME}"-sh
 fi
 
-if type zoxide >/dev/null 2>&1
-then
+if type zoxide >/dev/null 2>&1; then
   eval "$(zoxide init bash --cmd j)"
 fi
 
-if [[ -r "/etc/profile.d/bash_completion.sh" ]]
-then
+if [[ -r "/etc/profile.d/bash_completion.sh" ]]; then
   # shellcheck disable=SC1091
   . "/etc/profile.d/bash_completion.sh"
-elif [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]]
-then
+elif [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]]; then
   # shellcheck disable=SC1091
   . "/usr/local/etc/profile.d/bash_completion.sh"
-elif [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]]
-then
+elif [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]]; then
   # shellcheck disable=SC1091
   . "/opt/homebrew/etc/profile.d/bash_completion.sh"
 fi
@@ -146,4 +155,8 @@ fi
 
 if shopt -q login_shell; then
     [ -d ~/.fortune ] && fortune ~/.fortune
+fi
+
+if [ -d $HOME/.cargo ]; then
+  source "$HOME/.cargo/env"
 fi
