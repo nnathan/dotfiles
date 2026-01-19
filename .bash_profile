@@ -10,8 +10,15 @@ if [ -f /opt/homebrew/etc/bash_completion.d/ghostty ]; then
   builtin source /opt/homebrew/etc/bash_completion.d/ghostty
 fi
 
-# i don't need to see my username
-PS1='\h:\W \$ '
+netns_name() {
+  ip netns identify $$ 2>/dev/null
+}
+
+if [ "$(uname -s)" = "Linux" ] && [ -n "$(netns_name)" ]; then
+  PS1='(ns:$(netns_name)) \h:\W \$ '
+else
+  PS1='\h:\W \$ '
+fi
 
 # so i can recursive glob to find files e.g. echo src/**/App.java for a java src tree
 # only works in bash 4.x and later, while mac still supplies crummy bash 3
