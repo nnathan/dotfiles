@@ -1,3 +1,5 @@
+# brew bundle dump --file=Brewfile
+# brew bundle install --file=Brewfile
 brew "age"
 brew "aria2"
 brew "ascii"
