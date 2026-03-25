@@ -145,11 +145,12 @@ setupmac() {
   # --- VLC ---
   mkdir -p ~/Library/Preferences/org.videolan.vlc/
 
-  cat >~/Library/Preferences/org.videolan.vlc/vlcrc <<EOF
-[macosx] # Mac OS X interface
-macosx-interfacestyle=1
-macosx-recentitems=0
-EOF
+  # avoiding heredoc because you can't do it with leading whitespace
+  printf '%s\n' \
+    "[macosx] # Mac OS X interface" \
+    "macosx-interfacestyle=1" \
+    "macosx-recentitems=0" \
+    >~/Library/Preferences/org.videolan.vlc/vlcrc
 }
 # }}}
 
