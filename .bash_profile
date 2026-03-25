@@ -95,6 +95,10 @@ fi
 
 # {{{ setupmac
 setupmac() {
+  # Prompt for sudo upfront so it doesn't interrupt the rest of the run
+  echo "calling sudo upfront to pre-cache credentials"
+  sudo -v
+
   # --- Dock ---
   defaults write com.apple.dock autohide -bool true
   defaults write com.apple.dock autohide-delay -float 2.0
@@ -127,10 +131,41 @@ setupmac() {
   # --- Finder ---
   defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
+  # --- Appearance / Animations / Motion ---
+  # Dark mode
+  defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
+
+  # Reduce Motion (Accessibility → Display)
+  defaults write com.apple.universalaccess reduceMotion -bool true
+
+  # Reduce Transparency (usually want this alongside reduce motion)
+  defaults write com.apple.universalaccess reduceTransparency -bool true
+
+  # Disable window open/close animations
+  defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
+
+  # --- Accessibility Zoom ---
+  # Enable zoom
+  defaults write com.apple.universalaccess closeViewZoomNewWindowEnabled -bool true
+
+  # Use keyboard shortcuts to zoom (Command+Option+= / Command+Option+-)
+  defaults write com.apple.universalaccess closeViewHotkeysEnabled -bool true
+
+  # Smooth images while zoomed
+  defaults write com.apple.universalaccess closeViewSmoothImages -bool true
+
+  # --- Lock Screen Message ---
+  obscured_string="TWFjYm9vayBMb2Nrc2NyZWVuIE1lc3NhZ2UKSWYgZm91bmQgcGxlYXNlIHJldHVybiB0byBOYXZlZW4gTmF0aGFuOiBmYWNlYm9vayB1c2VybmFtZSAtIG5hdmVlbi5uYXRoYW47IHBob25lIGFuZCB3aGF0c2FwcCBhbmQgc2lnbmFsICs2MS00MDMtODMxLTY2MDsgb3IgZW1haWwgbmF2ZWVuQGxhc3RuaW5qYS5uZXQK"
+
+  echo 'calling sudo to set lockscreen message text'
+  sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText \
+    -string "$(base64 -d <<<$obscured_string)"
+
   # Restart affected services
   killall Dock
   killall Finder
   killall SystemUIServer
+  killall cfprefsd
 
   # --- File associations ---
   if type duti >/dev/null 2>&1; then
@@ -151,6 +186,13 @@ setupmac() {
     "macosx-interfacestyle=1" \
     "macosx-recentitems=0" \
     >~/Library/Preferences/org.videolan.vlc/vlcrc
+
+  # --- Touch ID for sudo ---
+  if ! grep -q 'pam_tid.so' /etc/pam.d/sudo; then
+    echo "calling sudo to setup touch id for sudo..."
+    sudo sed -i '' '1s/^/auth       sufficient     pam_tid.so\n/' /etc/pam.d/sudo
+    echo "Touch ID enabled for sudo"
+  fi
 }
 # }}}
 
