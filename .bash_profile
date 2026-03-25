@@ -155,7 +155,7 @@ setupmac() {
   defaults write com.apple.universalaccess closeViewSmoothImages -bool true
 
   # --- Lock Screen Message ---
-  obscured_string="TWFjYm9vayBMb2Nrc2NyZWVuIE1lc3NhZ2UKSWYgZm91bmQgcGxlYXNlIHJldHVybiB0byBOYXZlZW4gTmF0aGFuOiBmYWNlYm9vayB1c2VybmFtZSAtIG5hdmVlbi5uYXRoYW47IHBob25lIGFuZCB3aGF0c2FwcCBhbmQgc2lnbmFsICs2MS00MDMtODMxLTY2MDsgb3IgZW1haWwgbmF2ZWVuQGxhc3RuaW5qYS5uZXQK"
+  obscured_string="SWYgZm91bmQgcGxlYXNlIHJldHVybiB0byBOYXZlZW4gTmF0aGFuOiBmYWNlYm9vayB1c2VybmFtZSAtIG5hdmVlbi5uYXRoYW47IHBob25lIGFuZCB3aGF0c2FwcCBhbmQgc2lnbmFsICs2MS00MDMtODMxLTY2MDsgb3IgZW1haWwgbmF2ZWVuQGxhc3RuaW5qYS5uZXQK"
 
   echo 'calling sudo to set lockscreen message text'
   sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText \
