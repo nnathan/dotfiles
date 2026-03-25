@@ -154,6 +154,9 @@ setupmac() {
   # Smooth images while zoomed
   defaults write com.apple.universalaccess closeViewSmoothImages -bool true
 
+  # Disable the click on desktop to show desktop
+  defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
+
   # --- Lock Screen Message ---
   obscured_string="SWYgZm91bmQgcGxlYXNlIHJldHVybiB0byBOYXZlZW4gTmF0aGFuOiBmYWNlYm9vayB1c2VybmFtZSAtIG5hdmVlbi5uYXRoYW47IHBob25lIGFuZCB3aGF0c2FwcCBhbmQgc2lnbmFsICs2MS00MDMtODMxLTY2MDsgb3IgZW1haWwgbmF2ZWVuQGxhc3RuaW5qYS5uZXQK"
 
