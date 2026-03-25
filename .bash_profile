@@ -81,6 +81,65 @@ else
 fi
 # end permanent history
 
+
+setupmac() {
+  # --- Dock ---
+  defaults write com.apple.dock autohide -bool true
+  defaults write com.apple.dock autohide-delay -float 2.0
+  defaults write com.apple.dock autohide-time-modifier -float 0.5
+
+  if type dockutil >/dev/null 2>&1; then
+    dockutil --remove all --no-restart
+  else
+    echo "dockutil not found — skipping dock entry removal"
+  fi
+
+  # --- Trackpad ---
+  # Tap to click
+  defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+  defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+
+  # Full acceleration
+  defaults write NSGlobalDomain com.apple.trackpad.scaling -float 3.0
+
+  # Bottom-right corner secondary click
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadCornerSecondaryClick -int 2
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool false
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool false
+
+  # Non-natural scroll
+  defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
+
+  # --- Finder ---
+  defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
+  # Restart affected services
+  killall Dock
+  killall Finder
+  killall SystemUIServer
+
+  # --- File associations ---
+  if type duti >/dev/null 2>&1; then
+    local video_types=(.avi .mkv .mp4 .mov .wmv .flv .webm .mpg .mpeg)
+    for ext in "${video_types[@]}"; do
+      duti -s org.videolan.vlc "$ext" all
+    done
+  else
+    echo "duti not found — skipping file associations"
+  fi
+
+  # --- VLC ---
+  mkdir -p ~/Library/Preferences/org.videolan.vlc/
+
+  cat >~/Library/Preferences/org.videolan.vlc/vlcrc <<EOF
+[macosx] # Mac OS X interface
+macosx-interfacestyle=1
+macosx-recentitems=0
+EOF
+}
+
 alias lg='cd $(git rev-parse --show-toplevel)'
 alias lge='git rev-parse --show-toplevel'
 
