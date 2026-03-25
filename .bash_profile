@@ -1,6 +1,7 @@
+# vim: ts=2 sts=2 sw=2 et foldmethod=marker foldmarker={{{,}}}
 # always shfmt -i 2 this dealio
 
-# ghostty stuff
+# {{{ ghostty stuff
 GHOSTTY_SHELL_INTEGRATION_NO_CURSOR="1"
 if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
   builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/bash/ghostty.bash"
@@ -9,7 +10,9 @@ fi
 if [ -f /opt/homebrew/etc/bash_completion.d/ghostty ]; then
   builtin source /opt/homebrew/etc/bash_completion.d/ghostty
 fi
+# }}}
 
+# {{{ Linux network namespace stuff
 netns_name() {
   ip netns identify $$ 2>/dev/null
 }
@@ -19,19 +22,25 @@ if [ "$(uname -s)" = "Linux" ] && [ -n "$(netns_name)" ]; then
 else
   PS1='\h:\W \$ '
 fi
+# }}}
 
+# {{{ globstar
 # so i can recursive glob to find files e.g. echo src/**/App.java for a java src tree
 # only works in bash 4.x and later, while mac still supplies crummy bash 3
 if shopt 2>&1 | grep -q globstar; then
   shopt -s globstar
 fi
+# }}}
 
+# {{{ extglob
 # so i can do: !(vendor) or !(vendor)/ to expand to all files
 # that are not vendor (including directories) or directories only.
 if shopt 2>&1 | grep -q extglob; then
   shopt -s extglob
 fi
+# }}}
 
+# {{{ createcd
 createcd() {
   mkdir -p wav
   for file in *.mp3; do lame --decode "$file" "wav/${file%.mp3}.wav"; done
@@ -43,7 +52,9 @@ createcd() {
     done
   } >toc
 }
+# }}}
 
+# {{{ prargs and prargsq
 prargs() {
   OIFS="$IFS"
   IFS="$' \t'"
@@ -54,8 +65,9 @@ prargs() {
 prargsq() {
   printf "%q\n" "$@" | nl
 }
+# }}}
 
-# start permanent history
+# {{{ permanent history
 # https://eli.thegreenplace.net/2013/06/11/keeping-persistent-history-in-bash
 export HISTTIMEFORMAT="%F %T  "
 
@@ -79,9 +91,9 @@ if [ "$PROMPT_COMMAND" = "" ]; then
 else
   PROMPT_COMMAND="run_on_prompt_command; ""$PROMPT_COMMAND"
 fi
-# end permanent history
+# }}}
 
-
+# {{{ setupmac
 setupmac() {
   # --- Dock ---
   defaults write com.apple.dock autohide -bool true
@@ -139,10 +151,14 @@ macosx-interfacestyle=1
 macosx-recentitems=0
 EOF
 }
+# }}}
 
+# {{{ git aliases
 alias lg='cd $(git rev-parse --show-toplevel)'
 alias lge='git rev-parse --show-toplevel'
+# }}}
 
+# {{{ env vars and aliases
 # gnu guys are off their rockers
 # see: https://www.gnu.org/software/coreutils/quotes.html
 export QUOTING_STYLE=literal
@@ -185,17 +201,23 @@ if type rg >/dev/null 2>&1; then
 fi
 
 export JQ_COLORS="1;33:0;39:0;39:0;39:0;32:1;39:1;39"
+# }}}
 
+# {{{ keychain
 if type keychain >/dev/null 2>&1 && ! grep -qE '^\s+IdentityAgent.*com.1password.*agent.sock' ~/.ssh/config; then
   keychain ~/.ssh/id*[!.][!p][!u][!b]
   # shellcheck source=/dev/null # this is a linter directive
   . ~/.keychain/"${HOSTNAME}"-sh
 fi
+# }}}
 
+# {{{ zoxide
 if type zoxide >/dev/null 2>&1; then
   eval "$(zoxide init bash --cmd j)"
 fi
+# }}}
 
+# {{{ load bash_completion
 if [[ -r "/etc/profile.d/bash_completion.sh" ]]; then
   # shellcheck disable=SC1091
   . "/etc/profile.d/bash_completion.sh"
@@ -206,10 +228,9 @@ elif [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]]; then
   # shellcheck disable=SC1091
   . "/opt/homebrew/etc/profile.d/bash_completion.sh"
 fi
+# }}}
 
-# bash completion 2 only - for some reason completion breaks when using 2.
-#export BASH_COMPLETION_COMPAT_DIR="/usr/local/etc/bash_completion.d"
-
+# {{{ fzf bash
 if [ -f ~/.fzf.bash ]; then
   # shellcheck source=/dev/null # this is a linter directive
   source ~/.fzf.bash
@@ -218,11 +239,10 @@ if [ -f ~/.fzf.bash ]; then
   bind '"\C-t": transpose-chars'
   export FZF_DEFAULT_OPTS='--height=60% --border --inline-info --prompt="🥑 "'
 fi
+# }}}
 
-if shopt -q login_shell; then
-    [ -d ~/.fortune ] && fortune ~/.fortune
-fi
-
+# {{{ cargo
 if [ -d $HOME/.cargo ]; then
   source "$HOME/.cargo/env"
 fi
+# }}}
