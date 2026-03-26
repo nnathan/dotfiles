@@ -308,16 +308,22 @@ fi
 # }}}
 
 # {{{ fzf bash
-if [ -f ~/.fzf.bash ]; then
+fzf_loaded=1
+
+if [ -f /usr/share/fzf/key-bindings.bash ]; then
   # shellcheck source=/dev/null # this is a linter directive
-  source ~/.fzf.bash
-  # remove keybinding seems necessary otherwise bash seems to cry
-  bind -r "\C-t"
-  bind '"\C-t": transpose-chars'
-  export FZF_DEFAULT_OPTS='--height=60% --border --inline-info --prompt="🥑 "'
+  source /usr/share/fzf/key-bindings.bash
 elif [ -f /opt/homebrew/Cellar/fzf/*/shell/key-bindings.bash ]; then
   # shellcheck source=/dev/null # this is a linter directive
   source /opt/homebrew/Cellar/fzf/*/shell/key-bindings.bash
+elif [ -f ~/.fzf.bash ]; then
+  # shellcheck source=/dev/null # this is a linter directive
+  source ~/.fzf.bash
+else
+  fzf_loaded=''
+fi
+
+if [ x$fzf_loaded != x ]; then
   # remove keybinding seems necessary otherwise bash seems to cry
   bind -r "\C-t"
   bind '"\C-t": transpose-chars'
