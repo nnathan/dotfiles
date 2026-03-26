@@ -203,7 +203,11 @@ setupmac() {
 }
 # }}}
 
-# {{{ ls colours
+# {{{ ls colours & options
+# gnu guys are off their rockers
+# see: https://www.gnu.org/software/coreutils/quotes.html
+export QUOTING_STYLE=literal
+
 export LS_COLORS='di=1;38;2;100;200;255:fi=0:ln=38;2;0;200;180:ex=38;2;100;220;100:or=38;2;220;80;80'
 
 if [ "$(uname -s)" = "Darwin" ] && type gls >/dev/null 2>&1; then
@@ -213,18 +217,25 @@ elif [ "$(uname -s)" = "Linux" ]; then
 fi
 # }}}
 
+# {{{ grep colours
+export GREP_COLOR='00;38;5;157'
+alias grep='grep --color=auto'
+# }}}
+
 # {{{ git aliases
 alias lg='cd $(git rev-parse --show-toplevel)'
 alias lge='git rev-parse --show-toplevel'
 # }}}
 
-# {{{ env vars and aliases
-# gnu guys are off their rockers
-# see: https://www.gnu.org/software/coreutils/quotes.html
-export QUOTING_STYLE=literal
-
-export GREP_COLOR='00;38;5;157'
+# {{{ set editor to neovim
 export EDITOR=vim
+if type nvim >/dev/null 2>&1; then
+  alias vim='nvim'
+  export EDITOR=nvim
+fi
+# }}}
+
+# {{{ misc env vars and aliases
 export GOPATH=$HOME/go
 export PATH=$PATH:/usr/local/sbin:$HOME/.local/bin:$HOME/.local/sbin:${GOPATH//://bin:}/bin
 if [ "$(uname -s)" = Darwin ]; then
@@ -246,12 +257,6 @@ if [ "$(uname -s)" = Darwin ]; then
   if [ "$(uname -p)" = arm -a -d /opt/homebrew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
   fi
-fi
-
-export EDITOR=vim
-if type nvim >/dev/null 2>&1; then
-  alias vim='nvim'
-  export EDITOR=nvim
 fi
 
 if type rg >/dev/null 2>&1; then
