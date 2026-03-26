@@ -93,6 +93,8 @@ if [ "$PROMPT_COMMAND" = "" ]; then
 else
   PROMPT_COMMAND="run_on_prompt_command; ""$PROMPT_COMMAND"
 fi
+
+alias phgrep='cat ~/.persistent_history|grep --color'
 # }}}
 
 # {{{ setupmac
@@ -245,8 +247,6 @@ if [ "$(uname -s)" = Darwin ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
   fi
 fi
-
-alias phgrep='cat ~/.persistent_history|grep --color'
 
 export EDITOR=vim
 if type nvim >/dev/null 2>&1; then
