@@ -288,15 +288,22 @@ fi
 # }}}
 
 # {{{ load bash_completion
-if [[ -r "/etc/profile.d/bash_completion.sh" ]]; then
-  # shellcheck disable=SC1091
-  . "/etc/profile.d/bash_completion.sh"
-elif [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]]; then
-  # shellcheck disable=SC1091
-  . "/usr/local/etc/profile.d/bash_completion.sh"
-elif [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]]; then
-  # shellcheck disable=SC1091
-  . "/opt/homebrew/etc/profile.d/bash_completion.sh"
+if [ "$(uname -s)" != "Darwin" ]; then
+  if [[ -r "/usr/share/bash-completion/bash_completion" ]]; then
+    # shellcheck disable=SC1091
+    . "/usr/share/bash-completion/bash_completion"
+  elif [[ -r "/etc/profile.d/bash_completion.sh" ]]; then
+    # shellcheck disable=SC1091
+    . "/etc/profile.d/bash_completion.sh"
+  elif [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]]; then
+    # shellcheck disable=SC1091
+    . "/usr/local/etc/profile.d/bash_completion.sh"
+  fi
+else
+  if [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]]; then
+    # shellcheck disable=SC1091
+    . "/opt/homebrew/etc/profile.d/bash_completion.sh"
+  fi
 fi
 # }}}
 
