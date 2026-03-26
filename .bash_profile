@@ -12,13 +12,15 @@ if [ -f /opt/homebrew/etc/bash_completion.d/ghostty ]; then
 fi
 # }}}
 
-# {{{ Linux network namespace stuff
+# {{{ PS1 && Linux network namespace stuff
 netns_name() {
   ip netns identify $$ 2>/dev/null
 }
 
 if [ "$(uname -s)" = "Linux" ] && [ -n "$(netns_name)" ]; then
   PS1='(ns:$(netns_name)) \h:\W \$ '
+elif [ "$(uname -s)" = "Darwin" ]; then
+  PS1="$(scutil --get ComputerName):\W \$ "
 else
   PS1='\h:\W \$ '
 fi
