@@ -219,6 +219,11 @@ fi
 
 # {{{ grep colours
 export GREP_COLOR='00;38;5;157'
+if [ "$(uname -s)" = "Linux" ]; then
+  # new GNU quirk
+  export -n GREP_COLOR
+  export GREP_COLORS='mt=00;38;5;157'
+fi
 alias grep='grep --color=auto'
 # }}}
 
