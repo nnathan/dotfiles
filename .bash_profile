@@ -201,6 +201,16 @@ setupmac() {
 }
 # }}}
 
+# {{{ ls colours
+export LS_COLORS='di=1;38;2;100;200;255:fi=0:ln=38;2;0;200;180:ex=38;2;100;220;100:or=38;2;220;80;80'
+
+if [ "$(uname -s)" = "Darwin" ] && type gls >/dev/null 2>&1; then
+  alias ls='gls --color=auto'
+elif [ "$(uname -s)" = "Linux" ]; then
+  alias ls='ls --color=auto'
+fi
+# }}}
+
 # {{{ git aliases
 alias lg='cd $(git rev-parse --show-toplevel)'
 alias lge='git rev-parse --show-toplevel'
