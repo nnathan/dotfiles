@@ -251,6 +251,18 @@ fi
 export JQ_COLORS="1;33:0;39:0;39:0;39:0;32:1;39:1;39"
 # }}}
 
+# {{{ netstat
+if [ "$(uname -s)" = "Darwin" ]; then
+  netstat() {
+    if [[ "$1" =~ ^[0-9]+$ ]]; then
+      command netstat -w "$@"
+    else
+      command netstat "$@"
+    fi
+  }
+fi
+# }}}
+
 # {{{ keychain
 if type keychain >/dev/null 2>&1 && ! grep -qE '^\s+IdentityAgent.*com.1password.*agent.sock' ~/.ssh/config; then
   keychain ~/.ssh/id*[!.][!p][!u][!b]
