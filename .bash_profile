@@ -10,6 +10,12 @@ fi
 if [ -f /opt/homebrew/etc/bash_completion.d/ghostty ]; then
   builtin source /opt/homebrew/etc/bash_completion.d/ghostty
 fi
+
+if [[ "$TERM" == "xterm-ghostty" ]] && ! infocmp xterm-ghostty >/dev/null 2>&1 && infocmp ghostty >/dev/null 2>&1; then
+  export TERM=ghostty
+elif [[ "$TERM" == *ghostty* ]] && ! infocmp "$TERM" >/dev/null 2>&1; then
+  export TERM=xterm-256color
+fi
 # }}}
 
 # {{{ PS1 && Linux network namespace stuff
