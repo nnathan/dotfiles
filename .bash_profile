@@ -85,7 +85,7 @@ log_bash_persistent_history() {
   local date_part="${BASH_REMATCH[1]}"
   local command_part="${BASH_REMATCH[2]}"
   # removed duplicate suppression, since I want to preserve the exit codes
-  echo $date_part rc=$rc "|" "$command_part" >>~/.persistent_history
+  printf '%s rc=%3d | %s\n' "$date_part" "$rc" "$command_part" >>~/.persistent_history
 }
 
 run_on_prompt_command() {
