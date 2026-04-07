@@ -103,9 +103,17 @@ alias phgrep='cat ~/.persistent_history|grep --color'
 
 # {{{ setupmac
 setupmac() {
+  is_admin=0
+
+  if groups | grep -qE '\b(sudo|admin|wheel)\b'; then
+    is_admin=1
+  fi
+
   # Prompt for sudo upfront so it doesn't interrupt the rest of the run
-  echo "calling sudo upfront to pre-cache credentials"
-  sudo -v
+  if [ $is_admin = 1 ]; then
+    echo "calling sudo upfront to pre-cache credentials"
+    sudo -v
+  fi
 
   # --- Dock ---
   defaults write com.apple.dock autohide -bool true
@@ -168,9 +176,11 @@ setupmac() {
   # --- Lock Screen Message ---
   obscured_string="SWYgZm91bmQgcGxlYXNlIHJldHVybiB0byBOYXZlZW4gTmF0aGFuOiBmYWNlYm9vayB1c2VybmFtZSAtIG5hdmVlbi5uYXRoYW47IHBob25lIGFuZCB3aGF0c2FwcCBhbmQgc2lnbmFsICs2MS00MDMtODMxLTY2MDsgb3IgZW1haWwgbmF2ZWVuQGxhc3RuaW5qYS5uZXQK"
 
-  echo 'calling sudo to set lockscreen message text'
-  sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText \
-    -string "$(base64 -d <<<$obscured_string)"
+  if [ $is_admin = 1 ]; then
+    echo 'calling sudo to set lockscreen message text'
+    sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText \
+      -string "$(base64 -d <<<$obscured_string)"
+  fi
 
   # Restart affected services
   killall Dock
@@ -200,9 +210,11 @@ setupmac() {
 
   # --- Touch ID for sudo ---
   if ! grep -q 'pam_tid.so' /etc/pam.d/sudo; then
-    echo "calling sudo to setup touch id for sudo..."
-    sudo sed -i '' '1s/^/auth       sufficient     pam_tid.so\n/' /etc/pam.d/sudo
-    echo "Touch ID enabled for sudo"
+    if [ $is_admin = 1 ]; then
+      echo "calling sudo to setup touch id for sudo..."
+      sudo sed -i '' '1s/^/auth       sufficient     pam_tid.so\n/' /etc/pam.d/sudo
+      echo "Touch ID enabled for sudo"
+    fi
   fi
 }
 # }}}
