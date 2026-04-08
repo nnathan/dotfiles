@@ -277,6 +277,10 @@ if [ "$(uname -s)" = Darwin ]; then
 
   if [ "$(uname -p)" = arm -a -d /opt/homebrew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
+
+    if brew list | grep -q rustup; then
+      PATH="$(brew --prefix rustup)/bin":$PATH
+    fi
   fi
 fi
 
