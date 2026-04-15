@@ -13,6 +13,7 @@
   lg = log -p
   ll = log --graph --pretty=format:'%C(yellow)%h%C(cyan)%d%Creset %s %C(white)- %an, %ar%Creset'
   wt = worktree
+  pm = git fetch origin main:main
   hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
   type = cat-file -t
   dump = cat-file -p
@@ -51,5 +52,9 @@
   email = naveen@lastninja.net
 [rerere]
   enabled = true
+[includeIf "hasconfig:remote.*.url:git@git.slock.cc:**/**"]
+  path = ~/.gitconfig.work
+[includeIf "hasconfig:remote.*.url:git@github.com:senseon-tech/**"]
+  path = ~/.gitconfig.work
 [init]
-  defaultBranch = main
+	defaultBranch = main
