@@ -716,6 +716,8 @@ require("lazy").setup({
 						},
 					},
 				},
+
+				roslyn_ls = {},
 			}
 
 			-- Ensure the servers and tools above are installed
