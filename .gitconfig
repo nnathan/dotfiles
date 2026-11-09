@@ -11,6 +11,7 @@
   df = diff
   ds = diff --staged
   lg = log -p
+  lgc = log --no-patch
   ll = log --graph --pretty=format:'%C(yellow)%h%C(cyan)%d%Creset %s %C(white)- %an, %ar%Creset'
   wt = worktree
   pm = fetch origin main:main
