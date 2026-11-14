@@ -21,6 +21,10 @@ keybind = shift+end=scroll_to_bottom
 keybind = shift+page_up=scroll_page_up
 keybind = shift+page_down=scroll_page_down
 
+keybind = ctrl+bracket_left=text:\x1b
+keybind = ctrl+m=text:\r
+keybind = ctrl+i=text:\x09
+
 font-feature = "-calt"
 font-feature = "-liga"
 font-feature = "-dlig"
