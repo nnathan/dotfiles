@@ -316,6 +316,10 @@ if [ "$(uname -s)" = Darwin ]; then
       PATH="$(brew --prefix rustup)/bin":$PATH
     fi
 
+    if brew list | grep -q ffmpeg.full; then
+      PATH="$(brew --prefix ffmpeg-full)/bin":$PATH
+    fi
+
     if [ -d /opt/homebrew/opt/dotnet/libexec ]; then
       export DOTNET_ROOT=/opt/homebrew/opt/dotnet/libexec
     fi
